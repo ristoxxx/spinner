@@ -1,0 +1,78 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Roulette Wheel</title>
+     <style>
+         body { text-align: center; font-family: Arial, sans-serif; }
+         #wheel-container { position: relative; width: 300px; height: 300px; margin: 20px auto; }
+         #wheel { width: 100%; height: 100%; border-radius: 50%; border: 5px solid black; transition: transform 3s ease-out; }
+         #pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid red; }
+     </style>
+ </head>
+ <body>
+     <h1>Roulette Wheel</h1>
+     <p>Enter items and spin the wheel.</p>
+     <input type="text" id="item" placeholder="Add item"> 
+     <button onclick="addItem()">Add</button>
+     <ul id="item-list"></ul>
+     <div id="wheel-container">
+         <div id="pointer"></div>
+         <canvas id="wheel" width="300" height="300"></canvas>
+     </div>
+     <button onclick="spinWheel()">Spin</button>
+     <script>
+         let items = [];
+         let wheel = document.getElementById("wheel");
+         let ctx = wheel.getContext("2d");
+         let angle = 0;
+ 
+         function addItem() {
+             let itemInput = document.getElementById("item");
+             let itemText = itemInput.value.trim();
+             if (itemText) {
+                 items.push(itemText);
+                 updateItemList();
+                 drawWheel();
+                 itemInput.value = "";
+             }
+         }
+ 
+         function updateItemList() {
+             let list = document.getElementById("item-list");
+             list.innerHTML = "";
+             items.forEach((item, index) => {
+                 let li = document.createElement("li");
+                 li.textContent = item;
+                 list.appendChild(li);
+             });
+         }
+ 
+         function drawWheel() {
+             ctx.clearRect(0, 0, wheel.width, wheel.height);
+             let sliceAngle = (2 * Math.PI) / items.length;
+             items.forEach((item, i) => {
+                 let startAngle = i * sliceAngle;
+                 let endAngle = startAngle + sliceAngle;
+                 ctx.beginPath();
+                 ctx.moveTo(150, 150);
+                 ctx.arc(150, 150, 150, startAngle, endAngle);
+                 ctx.fillStyle = i % 2 === 0 ? "#ffcc00" : "#ff6600";
+                 ctx.fill();
+                 ctx.stroke();
+                 ctx.fillStyle = "black";
+                 ctx.fillText(item, 150 + Math.cos(startAngle + sliceAngle / 2) * 100, 150 + Math.sin(startAngle + sliceAngle / 2) * 100);
+             });
+         }
+ 
+         function spinWheel() {
+             if (items.length === 0) return;
+             let spins = Math.floor(Math.random() * 10) + 5;
+             let stopAngle = (Math.random() * 2 * Math.PI) + (spins * 2 * Math.PI);
+             wheel.style.transform = `rotate(${stopAngle}rad)`;
+         }
+     </script>
+ </body>
+ </html>
+ 
