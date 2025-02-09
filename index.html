@@ -8,15 +8,17 @@
          body { text-align: center; font-family: Arial, sans-serif; }
          #wheel-container { position: relative; width: 300px; height: 300px; margin: 20px auto; }
          #wheel { width: 100%; height: 100%; border-radius: 50%; border: 5px solid black; transition: transform 3s ease-out; }
-         #pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid red; }
+         #pointer { position: absolute; top: -20px; left: 50%; transform: translateX(-50%);transform: rotateZ(180deg); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid red; }
      </style>
  </head>
- <body>
+ <br>
      <h1>Roulette Wheel</h1>
      <p>Enter items and spin the wheel.</p>
-     <input type="text" id="item" placeholder="Add item"> 
+     <input type="text" id="item" placeholder="Add items (a,b,c)"> 
      <button onclick="addItem()">Add</button>
-     <ul id="item-list"></ul>
+     <button onclick="clearItems()">Clear</button>
+     <button onclick="makeDice()">Dice</button>
+     <ul id="item-list" style="list-style-type: none;"></ul>
      <div id="wheel-container">
          <div id="pointer"></div>
          <canvas id="wheel" width="300" height="300"></canvas>
@@ -29,15 +31,23 @@
          let angle = 0;
  
          function addItem() {
-             let itemInput = document.getElementById("item");
-             let itemText = itemInput.value.trim();
-             if (itemText) {
-                 items.push(itemText);
-                 updateItemList();
-                 drawWheel();
-                 itemInput.value = "";
-             }
-         }
+        let itemInput = document.getElementById("item");
+        let itemText = itemInput.value.trim();
+
+        if (itemText) {
+            // Split the input by commas and trim each item
+            let newItems = itemText.split(/,|;/).map(item => item.trim()).filter(item => item !== "");
+
+            // Add new items to the array
+            items.push(...newItems);
+
+            updateItemList();
+            drawWheel();
+
+            // Clear input field
+            itemInput.value = "";
+            }
+        }
  
          function updateItemList() {
              let list = document.getElementById("item-list");
@@ -47,6 +57,18 @@
                  li.textContent = item;
                  list.appendChild(li);
              });
+         }
+
+         function clearItems() {
+             items = [];
+             updateItemList();
+             drawWheel();
+         }
+
+         function makeDice() {
+             items = ["1", "2", "3", "4", "5", "6"];
+             updateItemList();
+             drawWheel();
          }
  
          function drawWheel() {
@@ -62,6 +84,7 @@
                  ctx.fill();
                  ctx.stroke();
                  ctx.fillStyle = "black";
+                 ctx.font = '2em serif'
                  ctx.fillText(item, 150 + Math.cos(startAngle + sliceAngle / 2) * 100, 150 + Math.sin(startAngle + sliceAngle / 2) * 100);
              });
          }
