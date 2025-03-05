@@ -72,30 +72,74 @@
          }
  
          function drawWheel() {
-             ctx.clearRect(0, 0, wheel.width, wheel.height);
-             let sliceAngle = (2 * Math.PI) / items.length;
-             items.forEach((item, i) => {
-                 let startAngle = i * sliceAngle;
-                 let endAngle = startAngle + sliceAngle;
-                 ctx.beginPath();
-                 ctx.moveTo(150, 150);
-                 ctx.arc(150, 150, 150, startAngle, endAngle);
-                 ctx.fillStyle = i % 2 === 0 ? "#ffcc00" : "#ff6600";
-                 ctx.fill();
-                 ctx.stroke();
-                 ctx.fillStyle = "black";
-                 ctx.font = '2em serif'
-                 ctx.fillText(item, 150 + Math.cos(startAngle + sliceAngle / 2) * 100, 150 + Math.sin(startAngle + sliceAngle / 2) * 100);
-             });
-         }
+            ctx.clearRect(0, 0, wheel.width, wheel.height);
+            let sliceAngle = (2 * Math.PI) / items.length;
+            
+            // Available colors
+            const colors = [
+                "#ffcc00", // yellow
+                "#ff6600", // orange
+                "#ff3366", // pink
+                "#0099ff", // blue
+                "#00ff00"  // green
+            ];
+            
+            // Array to store the color index of each slice
+            const sliceColors = [];
+            
+            items.forEach((item, i) => {
+                let startAngle = i * sliceAngle;
+                let endAngle = startAngle + sliceAngle;
+                
+                // Choose a color different from the previous slice
+                let colorIndex;
+                if (i === 0) {
+                    // First slice can use any color
+                    colorIndex = 0;
+                } else {
+                    // For subsequent slices, avoid the previous color
+                    const prevColorIndex = sliceColors[i-1];
+                    // Also handle the last slice wrapping around to the first slice
+                    const firstColorIndex = (i === items.length - 1) ? sliceColors[0] : -1;
+                    
+                    // Find a color that's not the same as the previous or first (if we're on the last slice)
+                    do {
+                        colorIndex = Math.floor(Math.random() * colors.length);
+                    } while (colorIndex === prevColorIndex || colorIndex === firstColorIndex);
+                }
+                
+                // Store this slice's color index
+                sliceColors.push(colorIndex);
+                
+                ctx.beginPath();
+                ctx.moveTo(150, 150);
+                ctx.arc(150, 150, 150, startAngle, endAngle);
+                ctx.fillStyle = colors[colorIndex];
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.fillStyle = "black";
+                ctx.font = '2em serif';
+                ctx.fillText(item, 150 + Math.cos(startAngle + sliceAngle / 2) * 100, 150 + Math.sin(startAngle + sliceAngle / 2) * 100);
+            });
+        }
  
          function spinWheel() {
-             if (items.length === 0) return;
-             let spins = Math.floor(Math.random() * 10) + 5;
-             let stopAngle = (Math.random() * 2 * Math.PI) + (spins * 2 * Math.PI);
-             wheel.style.transform = `rotate(${stopAngle}rad)`;
-         }
+            if (items.length === 0) return;
+            
+            let spins = Math.floor(Math.random() * 10) + 5;
+            let baseAngle = spins * 2 * Math.PI;
+            let sliceAngle = (2 * Math.PI) / items.length;
+
+            // Randomly select a section
+            let sectionIndex = Math.floor(Math.random() * items.length);
+            
+            // Calculate a safe stop angle near the center of the chosen section
+            let stopAngle = baseAngle + (sectionIndex * sliceAngle) + (sliceAngle * 2);
+            
+            wheel.style.transform = `rotate(${stopAngle}rad)`;
+        }
      </script>
  </body>
- </html>
+ </html>*
  
